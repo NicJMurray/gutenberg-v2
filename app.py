@@ -223,6 +223,7 @@ main .block-container { max-width: 100% !important; padding-left: 1rem; padding-
 
 with st.sidebar:
     st.header("Settings")
+    LIGHT_MODE = str(os.environ.get("LIGHT_MODE", "0")).lower() in {"1", "true", "yes"}
     top_n = st.slider(
         "How many rare words to return?",
         min_value=10,
@@ -233,7 +234,21 @@ with st.sidebar:
     )
     show_user_counts = st.checkbox("Show counts from your text", value=True)
     omit_non_dictionary = st.checkbox("Omit words not in dictionary", value=False)
-    include_context = st.checkbox("Show first-use context snippet", value=True)
+    include_context = st.checkbox(
+        "Show first-use context snippet",
+        value=(not LIGHT_MODE),
+        help="Disable for the lightest runtime.",
+    )
+    show_ipa = st.checkbox(
+        "Show IPA pronunciations",
+        value=(not LIGHT_MODE),
+        help="Disable to save memory/CPU on constrained hosts.",
+    )
+    show_defs = st.checkbox(
+        "Show definitions",
+        value=(not LIGHT_MODE),
+        help="Disable to save memory/CPU on constrained hosts.",
+    )
     show_unmatched = st.checkbox(
         "Show unmatched words table",
         value=False,
@@ -269,9 +284,12 @@ if upload:
                 f"Dictionary filter removed {filtered_out} word(s) without dictionary definitions."
             )
 
-    user_counts = (
-        pd.Series(tokens).value_counts().rename_axis("word").reset_index(name="user_count")
-    )
+    from collections import Counter
+    counts = Counter(tokens)
+    user_counts = pd.DataFrame({
+        "word": list(counts.keys()),
+        "user_count": list(counts.values()),
+    })
 
     # Fetch frequencies only for words present
     freq_df = fetch_frequencies(tuple(user_counts["word"]))
@@ -281,17 +299,13 @@ if upload:
     unmatched = joined[joined["frequency"].isna()].copy()
 
     # Pick N rarest (lowest frequency)
-    rareN = matched.sort_values("frequency", ascending=True).head(top_n)
-    rareN = rareN.assign(
-        pronunciation=rareN["word"].map(get_pronunciation),
-        definition=rareN["word"].map(get_definition),
-    )
-    rareN["pronunciation"] = rareN["pronunciation"].apply(
-        lambda v: v if isinstance(v, str) and v.strip() else ""
-    )
-    rareN["definition"] = rareN["definition"].apply(
-        lambda v: v if isinstance(v, str) and v.strip() else ""
-    )
+    rareN = matched.sort_values("frequency", ascending=True).head(top_n).copy()
+    if show_ipa:
+        rareN["pronunciation"] = rareN["word"].map(get_pronunciation)
+        rareN["pronunciation"] = rareN["pronunciation"].apply(lambda v: v if isinstance(v, str) and v.strip() else "")
+    if show_defs:
+        rareN["definition"] = rareN["word"].map(get_definition)
+        rareN["definition"] = rareN["definition"].apply(lambda v: v if isinstance(v, str) and v.strip() else "")
 
     if include_context:
         # Build context map for all words seen so we can apply to both tables
@@ -304,18 +318,22 @@ if upload:
     # Display main table
     st.subheader(f"Selected {top_n} words")
     # Column order: word, IPA, context, definition, count, frequency
-    cols = ["word", "pronunciation"]
+    cols = ["word"]
+    if show_ipa:
+        cols.append("pronunciation")
     if include_context:
         cols.append("context")
-    cols.append("definition")
+    if show_defs:
+        cols.append("definition")
     if show_user_counts:
         cols.append("user_count")
     cols.append("frequency")
 
-    column_config = {
-        "pronunciation": st.column_config.TextColumn("IPA", width="medium"),
-        "definition": st.column_config.TextColumn("Definition", width="large"),
-    }
+    column_config = {}
+    if show_ipa:
+        column_config["pronunciation"] = st.column_config.TextColumn("IPA", width="medium")
+    if show_defs:
+        column_config["definition"] = st.column_config.TextColumn("Definition", width="large")
     if include_context:
         column_config["context"] = st.column_config.TextColumn("Context", width="large")
 
@@ -334,24 +352,24 @@ if upload:
         st.caption(
             "These appeared in your text but not in the frequency CSV; treated as rarest by absence."
         )
-        um = unmatched.assign(
-            pronunciation=unmatched["word"].map(get_pronunciation),
-            definition=unmatched["word"].map(get_definition),
-        )
-        um["pronunciation"] = um["pronunciation"].apply(
-            lambda v: v if isinstance(v, str) and v.strip() else ""
-        )
-        um["definition"] = um["definition"].apply(
-            lambda v: v if isinstance(v, str) and v.strip() else ""
-        )
+        um = unmatched.copy()
+        if show_ipa:
+            um["pronunciation"] = um["word"].map(get_pronunciation)
+            um["pronunciation"] = um["pronunciation"].apply(lambda v: v if isinstance(v, str) and v.strip() else "")
+        if show_defs:
+            um["definition"] = um["word"].map(get_definition)
+            um["definition"] = um["definition"].apply(lambda v: v if isinstance(v, str) and v.strip() else "")
         if include_context:
             um = um.assign(context=um["word"].map(lambda w: context_map.get(w, "")))
             um["context"] = um["context"].apply(lambda v: v if isinstance(v, str) and v.strip() else "")
         # Column order for unmatched: word, IPA, context, definition, count
-        um_cols = ["word", "pronunciation"]
+        um_cols = ["word"]
+        if show_ipa:
+            um_cols.append("pronunciation")
         if include_context:
             um_cols.append("context")
-        um_cols.append("definition")
+        if show_defs:
+            um_cols.append("definition")
         um_cols.append("user_count")
         st.dataframe(
             um[um_cols].sort_values("user_count", ascending=False),
@@ -359,8 +377,8 @@ if upload:
             hide_index=True,
             height=min(600, 200 + 30 * max(len(um), 1)),
             column_config={
-                "pronunciation": st.column_config.TextColumn("IPA", width="medium"),
-                "definition": st.column_config.TextColumn("Definition", width="large"),
+                **({"pronunciation": st.column_config.TextColumn("IPA", width="medium")} if show_ipa else {}),
+                **({"definition": st.column_config.TextColumn("Definition", width="large")} if show_defs else {}),
                 "user_count": st.column_config.NumberColumn("Count in your text"),
             },
         )
