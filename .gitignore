@@ -1,5 +1,9 @@
 .venv/
 __pycache__/
+node_modules/
+.wrangler/
+public/data/
+public/gutenberg/data/
 *.log
 .DS_Store
 .pytest_cache/

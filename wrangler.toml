@@ -1,0 +1,13 @@
+name = "gutenberg"
+main = "src/worker.js"
+compatibility_date = "2026-05-07"
+workers_dev = true
+
+[[routes]]
+pattern = "njmurray.com/gutenberg*"
+zone_name = "njmurray.com"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+not_found_handling = "none"
