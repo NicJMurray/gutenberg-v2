@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const source = path.join(root, "data", "frequencies.csv");
-const outputDir = path.join(root, "public", "gutenberg", "data");
+const outputDir = path.join(root, "public", "data");
 
 await mkdir(outputDir, { recursive: true });
 

@@ -1,11 +1,11 @@
 name = "gutenberg"
 main = "src/worker.js"
 compatibility_date = "2026-05-07"
-workers_dev = true
+workers_dev = false
 
 [[routes]]
-pattern = "njmurray.com/gutenberg*"
-zone_name = "njmurray.com"
+pattern = "rare-words.njmurray.com"
+custom_domain = true
 
 [assets]
 directory = "./public"

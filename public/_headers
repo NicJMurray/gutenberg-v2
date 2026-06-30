@@ -1,11 +1,11 @@
-/gutenberg/data/frequencies-*.csv
+/data/frequencies-*.csv
   Cache-Control: public, max-age=31536000, immutable
 
-/gutenberg/data/manifest.json
+/data/manifest.json
   Cache-Control: public, max-age=300, must-revalidate
 
-/gutenberg/*.js
+/*.js
   Cache-Control: public, max-age=3600
 
-/gutenberg/*.css
+/*.css
   Cache-Control: public, max-age=3600

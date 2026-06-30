@@ -1,6 +1,6 @@
 # Gutenberg Rare Word Explorer
 
-Cloudflare-hosted rare word explorer for `https://njmurray.com/gutenberg`.
+Cloudflare-hosted rare word explorer for `https://rare-words.njmurray.com`.
 
 The app is now a small static frontend plus a Cloudflare Worker route. It no longer uses Streamlit, Pandas, NLTK, Render, Python requirements, or a long-running server process.
 
@@ -32,7 +32,7 @@ npm install
 npm run dev
 ```
 
-Wrangler will serve the app through the Worker path mount. Open the local URL shown by Wrangler and use `/gutenberg/`.
+Wrangler will serve the app at the local URL shown by `wrangler dev`.
 
 ## Build
 
@@ -40,7 +40,7 @@ Wrangler will serve the app through the Worker path mount. Open the local URL sh
 npm run build
 ```
 
-The build script copies `data/frequencies.csv` into `public/gutenberg/data/` as a hash-named file and writes `public/gutenberg/data/manifest.json`. Generated data assets are ignored by Git.
+The build script copies `data/frequencies.csv` into `public/data/` as a hash-named file and writes `public/data/manifest.json`. Generated data assets are ignored by Git.
 
 ## Deploy
 
@@ -52,24 +52,10 @@ npm run deploy
 
 ```toml
 [[routes]]
-pattern = "njmurray.com/gutenberg*"
-zone_name = "njmurray.com"
+pattern = "rare-words.njmurray.com"
+custom_domain = true
 ```
 
-Make sure `njmurray.com` has a proxied DNS record in Cloudflare before deploying the route.
+Make sure `rare-words.njmurray.com` has a proxied DNS record in Cloudflare before deploying the route.
 
-## njmurray.com Homepage Link
-
-Update the homepage project nav from:
-
-```html
-<a href="https://gutenberg.njmurray.com">Rare Words</a>
-```
-
-to:
-
-```html
-<a href="/gutenberg/">Rare Words</a>
-```
-
-This repository's metadata and in-app nav already use `https://njmurray.com/gutenberg`.
+Pushing to `main` also deploys through GitHub Actions. See [DEPLOYMENT.md](DEPLOYMENT.md) for the canonical URL, Worker name, and required secrets.
