@@ -2,9 +2,9 @@
 
 Cloudflare-hosted rare word explorer for `https://rare-words.njmurray.com`.
 
-The app is now a small static frontend plus a Cloudflare Worker route. It no longer uses Streamlit, Pandas, NLTK, Render, Python requirements, or a long-running server process.
+The app is a small static frontend plus a Cloudflare Worker route. It no longer uses Streamlit, Pandas, NLTK, Render, Python requirements, or a long-running server process.
 
-## What It Does
+## What it does
 
 - Loads `data/frequencies.csv` as a cached static asset.
 - Parses the frequency list in a browser Web Worker.
@@ -15,17 +15,13 @@ The app is now a small static frontend plus a Cloudflare Worker route. It no lon
 
 The former WordNet definitions and IPA pronunciations were removed because they required Python/NLTK data or external dictionary calls. Keeping the Cloudflare version static makes it faster, cheaper, and more reliable for this use case.
 
-## CSV Size
+## CSV size
 
-The current frequency file is about 6.5 MB with 400,000 data rows. That is fine for Cloudflare: Cloudflare's current Pages and Workers Static Assets limit for a single static asset is 25 MiB.
+The current frequency file is about 6.5 MB with 400,000 data rows. That is fine for Cloudflare's current Pages and Workers Static Assets single-file limits.
 
-If the frequency data grows beyond 25 MiB, move it to R2 or split it into hashed chunks.
+If the frequency data grows beyond the platform limit, move it to R2 or split it into hashed chunks.
 
-Sources:
-- Cloudflare Pages limits: https://developers.cloudflare.com/pages/platform/limits/
-- Cloudflare Workers limits: https://developers.cloudflare.com/workers/platform/limits/
-
-## Local Development
+## Local development
 
 ```bash
 npm install
@@ -42,13 +38,17 @@ npm run build
 
 The build script copies `data/frequencies.csv` into `public/data/` as a hash-named file and writes `public/data/manifest.json`. Generated data assets are ignored by Git.
 
-## Deploy
+## Deployment
+
+This is a Cloudflare Worker with static assets, so it still deploys with Wrangler rather than the Pages Git integration used by the static Pages repos.
 
 ```bash
 npm run deploy
 ```
 
-`wrangler.toml` is configured for:
+Automatic deploys run through GitHub Actions on pushes to `main`.
+
+`wrangler.toml` is configured for the custom domain route:
 
 ```toml
 [[routes]]
@@ -56,6 +56,4 @@ pattern = "rare-words.njmurray.com"
 custom_domain = true
 ```
 
-Make sure `rare-words.njmurray.com` has a proxied DNS record in Cloudflare before deploying the route.
-
-Pushing to `main` also deploys through GitHub Actions. See [DEPLOYMENT.md](DEPLOYMENT.md) for the canonical URL, Worker name, and required secrets.
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the deployment summary.
