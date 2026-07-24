@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320" role="img" aria-labelledby="title desc">
+  <title id="title">Rare Word Explorer</title>
+  <desc id="desc">Project banner for the browser-based rare-word analysis tool.</desc>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#cfd8d0" stroke-width="1" opacity=".55"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="320" fill="#f4f6f3"/>
+  <rect width="1200" height="320" fill="url(#grid)"/>
+  <rect x="64" y="48" width="48" height="48" rx="10" fill="#284f8f"/>
+  <text x="88" y="81" text-anchor="middle" fill="#fffef9" font-family="Georgia, serif" font-size="25" font-weight="700">N</text>
+  <text x="64" y="139" fill="#66716b" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="3">LANGUAGE / ANALYSIS</text>
+  <text x="64" y="207" fill="#171a1f" font-family="Georgia, serif" font-size="54" font-weight="500">Rare Word Explorer</text>
+  <text x="66" y="249" fill="#66716b" font-family="Inter, Arial, sans-serif" font-size="20">rare-words.njmurray.com</text>
+  <text x="951" y="124" fill="#284f8f" font-family="Georgia, serif" font-size="24">common</text>
+  <text x="1027" y="164" fill="#284f8f" font-family="Georgia, serif" font-size="34">unusual</text>
+  <text x="925" y="217" fill="#284f8f" font-family="Georgia, serif" font-size="48">arcane</text>
+  <rect y="310" width="1200" height="10" fill="#284f8f"/>
+</svg>
