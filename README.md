@@ -1,4 +1,6 @@
-# Gutenberg Rare Word Explorer
+![Rare Word Explorer](.github/readme-banner.svg)
+
+# Rare Word Explorer
 
 Browser-based text analyser at `rare-words.njmurray.com`. It ranks words from an uploaded `.txt` file against a precomputed frequency corpus and exposes the least frequent matches.
 
